@@ -46,8 +46,6 @@ public class UserView {
         }
     }
 
-    
-
     // hàm xử lý cho case 1 và 2
     private void processBookListResults(BookDAO bookDAO, List<Book> books) {
         if (books.isEmpty()) {
