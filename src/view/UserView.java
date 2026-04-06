@@ -4,16 +4,19 @@ import java.util.List;
 import java.util.Scanner;
 
 import dao.BookDAO;
+import display.UserDisplay;
 import model.Book;
 
 public class UserView {
 
     Scanner scanner = new Scanner(System.in);
 
+    UserDisplay user = new UserDisplay();
+
     public void displayUserView(BookDAO bookDAO) {
         boolean isUserRunning = true;
         while (isUserRunning) {
-            displayMenu();
+            user.displayMenu();
 
             int choice = -1;
             try {
@@ -25,13 +28,13 @@ public class UserView {
 
             switch (choice) {
                 case 1:
-                    handleSearchBook(bookDAO);
+                    handleSearchBook(bookDAO); // tìm kiếm sách
                     break;
                 case 2:
-                    handleCategoryFilter();
+                    handleCategoryFilter(bookDAO); // lọc thể loại
                     break;
                 case 3:
-                    handleCartReview();
+                    handleCartReview(); // xem giỏ hàng
                     break;
                 case 0:
                     isUserRunning = false;
@@ -43,94 +46,27 @@ public class UserView {
         }
     }
 
-    private void displayMenu() {
-        System.out.println("\n╔════════════════ MENU CHỨC NĂNG ════════════════╗");
-        System.out.println("║  1. Tìm kiếm sách                              ║");
-        System.out.println("║  2. Lọc thể loại                               ║");
-        System.out.println("║  3. Xem giỏ hàng                               ║");
-        System.out.println("║  0. Đăng xuất                                  ║");
-        System.out.println("╚════════════════════════════════════════════════╝");
-        System.out.print(" ➜ Mời bạn chọn chức năng (0-3): ");
-    }
+    
 
-    private void displaySubMenu() {
-        System.out.println("\n┌──────────────── TUỲ CHỌN ────────────────┐");
-        System.out.println("│ 1. Xem chi tiết sách                     │");
-        System.out.println("│ 2. Thêm sách vào giỏ hàng                │");
-        System.out.println("│ 0. Quay lại menu chính                   │");
-        System.out.println("└──────────────────────────────────────────┘");
-        System.out.print(" ➜ Mời bạn chọn (0-2): ");
-    }
-
-    private void displayBookBySearch(List<Book> foundBooks) {
-        System.out.println("\n╔═════════════════════ KẾT QUẢ TÌM KIẾM SÁCH ════════════════════╗");
-        for (Book b : foundBooks) {
-            System.out.printf("║ %-15s: %-45s ║%n", "ID", b.getId());
-            System.out.printf("║ %-15s: %-45s ║%n", "Tên sách", b.getTitle());
-            System.out.printf("║ %-15s: %-45s ║%n", "Tác giả", b.getAuthorName());
-            System.out.printf("║ %-15s: %-45s ║%n", "Ngày ra mắt", b.getCreatedAt().toString());
-            System.out.println("╠════════════════════════════════════════════════════════════════╣");
-        }
-    }
-
-    private void displayDetailBook(int detailId, Book detailBook) {
-        if (detailBook != null) {
-            System.out.println("\n╔════════════════════ THÔNG TIN CHI TIẾT SÁCH ═══════════════════╗");
-            System.out.printf("║ %-15s: %-45s ║\n", "Tên sách", detailBook.getTitle());
-            System.out.printf("║ %-15s: %-45s ║\n", "Tác giả", detailBook.getAuthorName());
-            System.out.printf("║ %-15s: %-45s ║\n", "Nhà xuất bản", detailBook.getPublisherName());
-            System.out.printf("║ %-15s: %-45s ║\n", "Thể loại", (detailBook.getCategories() != null ? detailBook.getCategories() : "Chưa cập nhật"));
-            System.out.printf("║ %-15s: %,.0f VNĐ%-34s ║\n", "Giá", detailBook.getPrice(), "");
-            System.out.printf("║ %-15s: %-45d ║\n", "Số trang", detailBook.getPageCount());
-            System.out.printf("║ %-15s: %-45d ║\n", "Tồn kho", detailBook.getStockQuantity());
-            System.out.println("╠═══════════════════════════════ Mô tả ══════════════════════════╣");
-
-            // Sử dụng thuật toán ngắt dòng đơn giản nếu mô tả quá dài
-            String desc = detailBook.getDescription();
-            if (desc != null) {
-                int wrapLength = 60;
-                for (int i = 0; i < desc.length(); i += wrapLength) {
-                    System.out.printf("║ %-62s ║\n", desc.substring(i, Math.min(desc.length(), i + wrapLength)));
-                }
-            } else {
-                System.out.printf("║ %-62s ║\n", "Đang cập nhật");
-            }
-
-            System.out.println(
-                    "╚════════════════════════════════════════════════════════════════╝");
-
-        } else {
-            System.out.println("  [!] Không tìm thấy sách với ID: " + detailId);
-        }
-    }
-
-    private void handleSearchBook(BookDAO bookDAO) {
-        System.out.println("\n┌─────────────────── TÌM KIẾM SÁCH ────────────────────┐");
-        System.out.print("  Nhập tên sách cần tìm (Nhấn 0 để quay lại): ");
-        String keyword = scanner.nextLine();
-        System.out.println("└──────────────────────────────────────────────────────┘");
-
-        if (keyword.equals("0")) {
-            return;
-        }
-
-        List<Book> foundBooks = bookDAO.searchBooksByName(keyword);
-
-        if (foundBooks.isEmpty()) {
+    // hàm xử lý cho case 1 và 2
+    private void processBookListResults(BookDAO bookDAO, List<Book> books) {
+        if (books.isEmpty()) {
             System.out.println("  [!] Không tìm thấy quyển sách nào phù hợp.");
+            // hiển thị lại menu chính
+
         } else {
             // Hiển thị kết quả với id, title, author_name, created_at
-            displayBookBySearch(foundBooks);
+            user.displayBookBySearch(books);
 
             boolean isSubMenuRunning = true;
             while (isSubMenuRunning) {
-                displaySubMenu();
+                user.displaySubMenu();
 
                 String subChoice = scanner.nextLine();
 
                 switch (subChoice) {
                     case "1":
-                        handleDetailSelection(bookDAO, foundBooks);
+                        handleDetailSelection(bookDAO, books);
                         break;
                     case "2":
                         handleAddToCartSelection();
@@ -143,40 +79,97 @@ public class UserView {
                 }
             }
         }
+
     }
 
-    private void handleCategoryFilter() {
-        System.out.println("\n┌──────────────── LỌC THỂ LOẠI ────────────────┐");
-        System.out.println("│ Tính năng đang được xây dựng...              │");
-        System.out.println("└──────────────────────────────────────────────┘");
+    // tìm kiếm sách case 1
+    private void handleSearchBook(BookDAO bookDAO) {
+
+        String keyword = "";
+
+        while (true) {
+            System.out.println("\n┌─────────────────── TÌM KIẾM SÁCH ────────────────────┐");
+            System.out.print("  Nhập tên sách cần tìm (Nhấn 0 để quay lại): ");
+            keyword = scanner.nextLine().trim();
+            System.out.println("└──────────────────────────────────────────────────────┘");
+
+            if (!keyword.isEmpty()) {
+                break;
+            }
+
+            System.out.println("  Vui lòng nhập lại");
+        }
+
+        if (keyword.equals("0")) {
+            return;
+        }
+
+        List<Book> foundBooks = bookDAO.searchBooksByName(keyword);
+
+        processBookListResults(bookDAO, foundBooks);
+
     }
 
+    // lọc thể loại case 2
+    private void handleCategoryFilter(BookDAO bookDAO) {
+
+        String keyword = "";
+
+        while (true) {
+            System.out.println("\n┌──────────────── LỌC SÁCH THEO THỂ LOẠI ─────────────────┐");
+            System.out.print("  Nhập thể loại cần tìm (Nhấn 0 để quay lại): ");
+            keyword = scanner.nextLine().trim();
+            System.out.println("└───────────────────────────────────────────────────────┘");
+
+            if (!keyword.isEmpty()) {
+                break;
+            }
+
+            System.out.println("  Vui lòng nhập lại");
+        }
+
+        if (keyword.equals("0")) {
+            return;
+        }
+
+        List<Book> foundBooks = bookDAO.getBooksByCategory(keyword);
+
+        processBookListResults(bookDAO, foundBooks);
+
+    }
+
+    // xem giỏ hàng case 3
     private void handleCartReview() {
         System.out.println("\n┌────────────── GIỎ HÀNG CỦA BẠN ──────────────┐");
         System.out.println("│ Tính năng đang được xây dựng...              │");
         System.out.println("└──────────────────────────────────────────────┘");
     }
 
+    // hiển thị chi tiết sách được chọn
     private void handleDetailSelection(BookDAO bookDAO, List<Book> foundBooks) {
+        Book targetBook = null;
+
         if (foundBooks.size() == 1) {
-            Book soleBook = bookDAO.getBookById(foundBooks.get(0).getId());
-            displayDetailBook(soleBook.getId(), soleBook);
+            targetBook = bookDAO.getBookById(foundBooks.get(0).getId());
         } else {
             System.out.print(" ➜ Nhập ID sách muốn xem chi tiết: ");
-            String detailIdStr = scanner.nextLine();
-
             try {
-                int detailId = Integer.parseInt(detailIdStr);
-                Book detailBook = bookDAO.getBookById(detailId);
-
-                displayDetailBook(detailId, detailBook);
-                
+                int detailId = Integer.parseInt(scanner.nextLine());
+                targetBook = bookDAO.getBookById(detailId);
             } catch (NumberFormatException e) {
                 System.out.println("  [!] ID sách phải là một số hợp lệ!");
+                return;
             }
+        }
+
+        if (targetBook != null) {
+            user.displayDetailBook(targetBook.getId(), targetBook);
+        } else {
+            System.out.println("  [!] Không tìm thấy thông tin sách!");
         }
     }
 
+    // thêm vào giỏ hàng
     private void handleAddToCartSelection() {
         System.out.print(" ➜ Nhập ID sách muốn thêm vào giỏ: ");
         String cartBookIdStr = scanner.nextLine();
@@ -185,5 +178,14 @@ public class UserView {
         // TODO: Xử lý thêm vào giỏ hàng
         System.out.println("  [*] Đang xây dựng chức năng thêm giỏ hàng cho ID: " + cartBookIdStr);
     }
-    
+
+    // thêm vào giỏ hàng khi đã có ID (gọi từ menu chi tiết)
+    private void handleAddToCartSelection(int preselectedBookId) {
+        System.out.println(" ➜ Thêm sách có ID: " + preselectedBookId + " vào giỏ");
+        System.out.print(" ➜ Nhập số lượng: ");
+        // String quantityStr = scanner.nextLine();
+        // TODO: Xử lý thêm vào giỏ hàng với preselectedBookId
+        System.out.println("  [*] Đang xây dựng chức năng thêm giỏ hàng cho ID: " + preselectedBookId);
+    }
+
 }

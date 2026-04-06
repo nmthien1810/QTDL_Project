@@ -12,7 +12,7 @@ public class Book {
     private String description;
     private int pageCount;
     private int stockQuantity;
-    private String categories;
+    private String category;
 
     // Constructor rỗng
     public Book() {
@@ -91,11 +91,11 @@ public class Book {
         this.stockQuantity = stockQuantity;
     }
 
-    public String getCategories() {
-        return categories;
+    public String getCategory() {
+        return category;
     }
 
-    public void setCategories(String categories) {
-        this.categories = categories;
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

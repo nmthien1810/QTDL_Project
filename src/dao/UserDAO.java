@@ -30,9 +30,11 @@ public class UserDAO {
                 user.setPassword(rs.getString("password"));
                 user.setAdmin(rs.getBoolean("is_admin"));
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
         return user;
 
     }
