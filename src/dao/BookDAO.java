@@ -227,4 +227,21 @@ public class BookDAO {
             return false;
         }
     }
+
+    // Giảm tồn kho, trả về true nếu cập nhật thành công (tồn kho đủ)
+    public boolean reduceStock(int bookId, int amount) {
+        String sql = "UPDATE book SET stock_quantity = stock_quantity - ? WHERE id = ? AND stock_quantity >= ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, amount);
+            pstmt.setInt(2, bookId);
+            pstmt.setInt(3, amount);
+            int updated = pstmt.executeUpdate();
+            return updated == 1;
+        } catch (Exception e) {
+            System.out.println("Lỗi khi cập nhật tồn kho: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

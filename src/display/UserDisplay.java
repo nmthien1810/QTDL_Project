@@ -24,6 +24,15 @@ public class UserDisplay {
         System.out.print(" ➜ Mời bạn chọn (0-2): ");
     }
 
+    public void displayDetailSubMenu() {
+        System.out.println("\n┌────────── CHI TIẾT SÁCH - TÙY CHỌN ──────────┐");
+        System.out.println("│ 1. Thêm vào giỏ hàng                         │");
+        System.out.println("│ 0. Quay lại                                  │");
+        System.out.println("└──────────────────────────────────────────────┘");
+        System.out.print(" ➜ Mời bạn chọn (0-1): ");
+    }
+
+
     // hiển thị sách theo tìm kiếm
     public void displayBookBySearch(List<Book> foundBooks) {
         System.out.println("\n╔═════════════════════ KẾT QUẢ TÌM KIẾM SÁCH ════════════════════╗");
